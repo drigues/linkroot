@@ -5,7 +5,7 @@ export default function Home() {
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center text-center max-w-2xl">
         <Image
-          src="vercel.svg"
+          src="linkroot-logo.svg"
           alt="LinkRoot logo"
           width={140}
           height={40}
@@ -13,12 +13,8 @@ export default function Home() {
         />
 
         <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">
-          ~ LinkRoot ~
+          About
         </h1>
-
-        <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight">
-          Your smart link-in-bio that grows with you.
-        </h2>
 
         <p className="text-base sm:text-lg text-muted-foreground font-[family-name:var(--font-geist-mono)]">
           LinkRoot helps creators, freelancers and brands manage their digital presence through beautiful, intelligent link hubs.
@@ -42,7 +38,8 @@ export default function Home() {
 
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center text-sm text-muted-foreground">
         <a
-          href="/about"
+          href="https://linkroot.xyz/about"
+          target="_blank"
           rel="noopener noreferrer"
           className="hover:underline hover:underline-offset-4"
         >
@@ -50,6 +47,7 @@ export default function Home() {
         </a>
         <a
           href="https://linkroot.xyz/pricing"
+          target="_blank"
           rel="noopener noreferrer"
           className="hover:underline hover:underline-offset-4"
         >
@@ -57,13 +55,14 @@ export default function Home() {
         </a>
         <a
           href="https://linkroot.xyz/docs"
+          target="_blank"
           rel="noopener noreferrer"
           className="hover:underline hover:underline-offset-4"
         >
           Docs
         </a>
         <a
-          href="/contact"
+          href="mailto:support@linkroot.xyz"
           className="hover:underline hover:underline-offset-4"
         >
           Contact
