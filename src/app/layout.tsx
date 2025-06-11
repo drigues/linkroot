@@ -1,23 +1,24 @@
 import './globals.css';
 import Link from "next/link";
+import { ReactNode } from "react";
 
 export const metadata = {
   title: 'LinkRoot',
   description: 'Your smart link-in-bio platform that grows with you.',
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
         <header>
           <nav>
             <ul>
-              <li><a href="/">Home</a></li>
-              <li><a href="/about">About</a></li>
-              <li><a href="/examples">Examples</a></li>
-              <li><a href="/signup">Sign Up</a></li>
-              <li><a href="/contact">Contact</a></li>
+              <li><Link href="/">Home</Link></li>
+              <li><Link href="/about">About</Link></li>
+              <li><Link href="/examples">Examples</Link></li>
+              <li><Link href="/signup">Sign Up</Link></li>
+              <li><Link href="/contact">Contact</Link></li>
             </ul>
           </nav>
         </header>
