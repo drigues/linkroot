@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "https://linkroot-api.up.railway.app/:path*", // string literal
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`, // now dynamic
       },
     ];
   },
