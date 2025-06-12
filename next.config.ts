@@ -2,19 +2,18 @@ import type { NextConfig } from "next";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-if (!apiUrl) {
-  console.warn("⚠️ Warning: NEXT_PUBLIC_API_URL is not defined! API rewrites will be skipped.");
-}
-
 const nextConfig: NextConfig = {
   async rewrites() {
-    if (!apiUrl) {
-      return []; // Prevents crash
+    // Vercel builds crash silently if the env var is undefined or empty
+    if (!apiUrl || !apiUrl.startsWith("http")) {
+      console.warn("⚠️ NEXT_PUBLIC_API_URL is missing or invalid. Skipping rewrites.");
+      return []; // Return empty array instead of undefined
     }
+
     return [
       {
         source: "/api/:path*",
-        destination: `${apiUrl}/:path*`, // proxy to your FastAPI backend
+        destination: `${apiUrl}/:path*`,
       },
     ];
   },
