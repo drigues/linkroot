@@ -4,7 +4,7 @@ app = FastAPI()
 
 @app.get("/ping")
 def ping():
-    return {"msg": "pong"}
+    return {"msg": "pong pong"}
 
 @app.get("/check-directory")
 def check_directory(slug: str):
@@ -13,4 +13,4 @@ def check_directory(slug: str):
 
 @app.get("/")
 def root():
-    return {"status": "FastAPI backend is running!"}
+    return {"status": "FastAPI backend is running! OMGOSH!"}
