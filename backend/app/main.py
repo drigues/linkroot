@@ -1,7 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from . import models, database
-
+from fastapi.middleware.cors import CORSMiddleware
+ 
+# Initialize the database
 models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI()
@@ -13,6 +15,7 @@ def get_db():
     finally:
         db.close()
 
+# Define the root endpoint
 @app.get("/ping")
 def ping():
     return {"msg": "pong"}
@@ -30,3 +33,15 @@ def create_user(name: str, email: str, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     return new_user
+
+# Add this middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "https://linkroot-sepia.vercel.app",  # ✅ your current deployed frontend
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
