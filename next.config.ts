@@ -1,11 +1,20 @@
 import type { NextConfig } from "next";
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+if (!apiUrl) {
+  console.warn("⚠️ Warning: NEXT_PUBLIC_API_URL is not defined! API rewrites will be skipped.");
+}
+
 const nextConfig: NextConfig = {
   async rewrites() {
+    if (!apiUrl) {
+      return []; // Prevents crash
+    }
     return [
       {
         source: "/api/:path*",
-        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`, // now dynamic https://linkroot-production.up.railway.app/
+        destination: `${apiUrl}/:path*`, // proxy to your FastAPI backend
       },
     ];
   },
