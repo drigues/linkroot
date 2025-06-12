@@ -1,25 +1,32 @@
-from fastapi import FastAPI
-from sqlalchemy import create_engine, text
-import os
+from fastapi import FastAPI, Depends, HTTPException
+from sqlalchemy.orm import Session
+from . import models, database
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-engine = create_engine(DATABASE_URL)
-
-# Optional: test connection
-with engine.connect() as connection:
-    result = connection.execute(text("SELECT 1"))
-    print("Database connected:", result.fetchone())
+models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI()
+
+def get_db():
+    db = database.SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 @app.get("/ping")
 def ping():
     return {"msg": "pong"}
 
-@app.get("/check-directory")
-def check_directory(slug: str):
-    return {"available": slug.lower() != "thiago"}
+@app.get("/users")
+def read_users(db: Session = Depends(get_db)):
+    return db.query(models.User).all()
 
-@app.get("/")
-def root():
-    return {"status": "ok"}
+@app.post("/users")
+def create_user(name: str, email: str, db: Session = Depends(get_db)):
+    if db.query(models.User).filter(models.User.email == email).first():
+        raise HTTPException(status_code=400, detail="Email already registered")
+    new_user = models.User(name=name, email=email)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
