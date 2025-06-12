@@ -1,11 +1,13 @@
 import type { NextConfig } from "next";
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://placeholder.local";
+
 const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
         source: "/api/:path*",
-        destination: "https://linkroot-production.up.railway.app/:path*", // HARDCODED AND STABLE
+        destination: `${apiUrl}/:path*`,
       },
     ];
   },
