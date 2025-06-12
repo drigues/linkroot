@@ -1,3 +1,10 @@
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
+from app.database import SQLALCHEMY_DATABASE_URL, Base
+from app import models  # this ensures your models are registered with Base.metadata
+
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from . import models, database
