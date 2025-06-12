@@ -1,13 +1,2 @@
-# For working with CORS (useful with Next.js frontend)
-fastapi[all]
-
-# For PostgreSQL + SQLAlchemy
-sqlalchemy
-asyncpg
-
-# For validation and typing
-pydantic
-
-# For testing
-pytest
-httpx
+fastapi
+uvicorn
