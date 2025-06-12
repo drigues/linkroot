@@ -10,3 +10,7 @@ def ping():
 def check_directory(slug: str):
     # Simulated response: treat "thiago" as already taken
     return {"available": slug.lower() != "thiago"}
+
+@app.get("/")
+def root():
+    return {"status": "FastAPI backend is running!"}
