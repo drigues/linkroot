@@ -15,7 +15,7 @@ import { decodeJWT, getTokenFromCookie, removeTokenCookie } from '@/lib/auth';
 type DecodedJWT = {
   email: string;
   name?: string;
-  [key: string]: any;
+  [key: string]: unknown; // ✅ replaced `any` with `unknown`
 };
 
 export default function DashboardPage() {

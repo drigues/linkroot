@@ -52,7 +52,7 @@ export default function LoginPage() {
 
       Cookies.set('token', access_token, { expires: 1 }); // Token saved for 1 day
       router.push('/dashboard');
-    } catch (err) {
+    } catch {
       setServerError('Something went wrong. Please try again.');
     }
   };

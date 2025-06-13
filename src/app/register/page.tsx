@@ -43,7 +43,7 @@ export default function RegisterPage() {
       }
 
       router.push('/login');
-    } catch (err) {
+    } catch {
       setServerError('Something went wrong. Please try again.');
     }
   };
