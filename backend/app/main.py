@@ -9,11 +9,18 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from . import models, database
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.auth.routes import router as auth_router
+from app.db.database import Base, engine
+
+Base.metadata.create_all(bind=engine)
  
 # Initialize the database
 models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI()
+
+app.include_router(auth_router)
 
 def get_db():
     db = database.SessionLocal()

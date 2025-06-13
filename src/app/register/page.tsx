@@ -1,89 +1,107 @@
-// app/register/page.tsx or pages/register.tsx
-"use client"; // for app directory
-import { useState, useEffect } from "react";
+'use client';
+
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Alert,
+  Stack,
+} from '@mui/material';
+import { useForm } from 'react-hook-form';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+type RegisterFormInputs = {
+  email: string;
+  password: string;
+};
 
 export default function RegisterPage() {
-  const [directory, setDirectory] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [dirAvailable, setDirAvailable] = useState<null | boolean>(null);
-  const [message, setMessage] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormInputs>();
 
-  useEffect(() => {
-    if (directory) {
-      const delayDebounce = setTimeout(() => {
-        fetch(`/api/check-directory?directory=${directory}`)
-          .then(res => res.json())
-          .then(data => setDirAvailable(data.available));
-      }, 500);
+  const [serverError, setServerError] = useState('');
+  const router = useRouter();
 
-      return () => clearTimeout(delayDebounce);
-    }
-  }, [directory]);
+  const onSubmit = async (data: RegisterFormInputs) => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
+      if (!res.ok) {
+        const result = await res.json();
+        setServerError(result.detail || 'Registration failed');
+        return;
+      }
 
-    const res = await fetch("/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ directory, email, password }),
-    });
-
-    const data = await res.json();
-    if (res.ok) {
-      setMessage("Successfully registered! 🎉");
-    } else {
-      setMessage(data.detail || "Something went wrong");
+      router.push('/login');
+    } catch (err) {
+      setServerError('Something went wrong. Please try again.');
     }
   };
 
   return (
-    <form onSubmit={handleRegister} className="max-w-md mx-auto space-y-4">
-      <div>
-        <label>Directory</label>
-        <input
-          value={directory}
-          onChange={(e) => setDirectory(e.target.value)}
-          className="border p-2 w-full"
-        />
-        {dirAvailable !== null && (
-          <p className={dirAvailable ? "text-green-500" : "text-red-500"}>
-            {dirAvailable ? "Available!" : "Already taken"}
-          </p>
+    <Container maxWidth="sm">
+      <Box sx={{ mt: 8 }}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          Register
+        </Typography>
+
+        {serverError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {serverError}
+          </Alert>
         )}
-      </div>
 
-      <div>
-        <label>Email</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="border p-2 w-full"
-          required
-        />
-      </div>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          <Stack spacing={2}>
+            <TextField
+              fullWidth
+              label="Email"
+              type="email"
+              {...register('email', {
+                required: 'Email is required',
+                pattern: {
+                  value: /^\S+@\S+$/i,
+                  message: 'Enter a valid email',
+                },
+              })}
+              error={!!errors.email}
+              helperText={errors.email?.message}
+              autoComplete="email"
+              autoFocus
+            />
 
-      <div>
-        <label>Password</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="border p-2 w-full"
-          required
-        />
-      </div>
+            <TextField
+              fullWidth
+              label="Password"
+              type="password"
+              {...register('password', {
+                required: 'Password is required',
+                minLength: {
+                  value: 6,
+                  message: 'Password must be at least 6 characters',
+                },
+              })}
+              error={!!errors.password}
+              helperText={errors.password?.message}
+              autoComplete="new-password"
+            />
 
-      <button
-        type="submit"
-        className="bg-blue-600 text-white py-2 px-4 rounded"
-      >
-        Register
-      </button>
-
-      {message && <p className="text-sm mt-2">{message}</p>}
-    </form>
+            <Button type="submit" variant="contained" fullWidth>
+              Register
+            </Button>
+          </Stack>
+        </form>
+      </Box>
+    </Container>
   );
 }

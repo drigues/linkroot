@@ -5,6 +5,11 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 from dotenv import load_dotenv
 
+from app.database import Base
+from app.models import User  # or from app.auth.models
+target_metadata = Base.metadata
+
+
 # Load environment variables from .env
 load_dotenv()
 

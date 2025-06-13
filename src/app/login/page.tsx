@@ -1,95 +1,109 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Container,
-  Box,
   Typography,
   TextField,
   Button,
+  Box,
   Alert,
-  Divider,
-} from "@mui/material";
+  Stack,
+} from '@mui/material';
+import { useForm } from 'react-hook-form';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
+
+type LoginFormInputs = {
+  email: string;
+  password: string;
+};
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormInputs>();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    // TODO: Replace with real API call
+  const [serverError, setServerError] = useState('');
+  const router = useRouter();
+
+  const onSubmit = async (data: LoginFormInputs) => {
     try {
-      // Example: await api.login({ email, password });
-      if (email === "test@example.com" && password === "password") {
-        router.push("/dashboard");
-      } else {
-        setError("Invalid credentials");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      const responseData = await res.json();
+
+      if (!res.ok) {
+        setServerError(responseData.detail || 'Login failed. Check your credentials.');
+        return;
       }
-    } catch {
-      setError("Login failed. Please try again.");
+
+      const { access_token } = responseData;
+      if (!access_token) {
+        setServerError('Invalid token received.');
+        return;
+      }
+
+      Cookies.set('token', access_token, { expires: 1 }); // Token saved for 1 day
+      router.push('/dashboard');
+    } catch (err) {
+      setServerError('Something went wrong. Please try again.');
     }
   };
 
-  const handleSocialLogin = () => {
-    // TODO: Implement social login
-    alert("Social login not implemented yet.");
-  };
-
   return (
-    <Container maxWidth="xs">
-      <Box sx={{ mt: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <Typography component="h1" variant="h5" gutterBottom>
-          Sign in to LinkRoot
+    <Container maxWidth="sm">
+      <Box sx={{ mt: 8 }}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          Login
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: "100%" }}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            label="Email Address"
-            type="email"
-            autoComplete="email"
-            autoFocus
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            label="Password"
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
-          {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            Sign In
-          </Button>
-          <Divider sx={{ my: 2 }}>or</Divider>
-          <Button
-            fullWidth
-            variant="outlined"
-            onClick={handleSocialLogin}
-          >
-            Sign in with Google {/* TODO: Add real social login */}
-          </Button>
-          <Box sx={{ mt: 2, textAlign: "center" }}>
-            <Button href="/signup" size="small">
-              Don't have an account? Sign Up
+
+        {serverError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {serverError}
+          </Alert>
+        )}
+
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          <Stack spacing={2}>
+            <TextField
+              fullWidth
+              label="Email"
+              type="email"
+              {...register('email', {
+                required: 'Email is required',
+                pattern: {
+                  value: /^\S+@\S+$/i,
+                  message: 'Enter a valid email',
+                },
+              })}
+              error={!!errors.email}
+              helperText={errors.email?.message}
+              autoComplete="email"
+              autoFocus
+            />
+
+            <TextField
+              fullWidth
+              label="Password"
+              type="password"
+              {...register('password', { required: 'Password is required' })}
+              error={!!errors.password}
+              helperText={errors.password?.message}
+              autoComplete="current-password"
+            />
+
+            <Button type="submit" variant="contained" fullWidth>
+              Log In
             </Button>
-          </Box>
-        </Box>
+          </Stack>
+        </form>
       </Box>
     </Container>
   );
