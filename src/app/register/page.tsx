@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 type RegisterFormInputs = {
+  name: string;
   email: string;
   password: string;
 };
@@ -33,7 +34,7 @@ export default function RegisterPage() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify(data), // includes name, email, password
       });
 
       if (!res.ok) {
@@ -65,6 +66,15 @@ export default function RegisterPage() {
           <Stack spacing={2}>
             <TextField
               fullWidth
+              label="Name"
+              {...register('name', { required: 'Name is required' })}
+              error={!!errors.name}
+              helperText={errors.name?.message}
+              autoComplete="name"
+            />
+
+            <TextField
+              fullWidth
               label="Email"
               type="email"
               {...register('email', {
@@ -77,7 +87,6 @@ export default function RegisterPage() {
               error={!!errors.email}
               helperText={errors.email?.message}
               autoComplete="email"
-              autoFocus
             />
 
             <TextField
