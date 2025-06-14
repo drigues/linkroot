@@ -5,9 +5,13 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "https://linkroot-production.up.railway.app/:path*", // ✅ Hardcoded to unblock
+        destination: "https://linkroot-production.up.railway.app/:path*",
       },
     ];
+  },
+  webpack(config) {
+    config.snapshot = { managedPaths: [] }; // ✅ fixes .updateWithBuffer crash
+    return config;
   },
 };
 
